@@ -1,0 +1,16 @@
+# Default values for mongodb.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicas: 1
+
+image:
+  repository: mongo
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "5.0.6"
+
+service:
+  type: ClusterIP
+  targetPort: 27017
+  port: 27017
