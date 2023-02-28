@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cron-test
+  namespace: training
+spec:
+  schedule: "*/2 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          initContainers:
+          - name: init-container
+            image: busybox:1.28
+            command: ["/bin/sh", "-c"]
+            args:
+             - echo Creating the output file to store all the disk details used by filesystem;
+               df -T -h > output.txt && sleep 30;
+               mv output.txt /cron;
+            volumeMounts:
+            - name: cron-volume
+              mountPath: "/cron"
+          containers:
+          - name: output-container
+            image: busybox:1.28
+            command: ["/bin/sh", "-c"]
+            args:
+             - ls -lart;
+               cd cron/ && ls -lart;
+               echo Showing the output of the file created by init container;
+               cat output.txt;
+               sleep 30;
+            volumeMounts:
+            - name: cron-volume
+              mountPath: "/cron"
+          volumes:
+          - name: cron-volume
+            emptyDir: {}
+          restartPolicy: OnFailure
